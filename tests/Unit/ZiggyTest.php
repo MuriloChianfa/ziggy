@@ -578,7 +578,7 @@ class ZiggyTest extends TestCase
             $json = str_replace(
                 '}}}',
                 '},"postComments.show":{"uri":"posts\/{post}\/comments\/{comment}","methods":["GET","HEAD"],"bindings":{"comment":"uuid"}}}}',
-                $json,
+                $json
             );
         }
 
