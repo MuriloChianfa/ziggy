@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\URL;
 use Tests\TestCase;
 use Tightenco\Ziggy\Output\File;
+use Tightenco\Ziggy\Output\Script;
 
 class CommandRouteGeneratorTest extends TestCase
 {
@@ -113,6 +114,28 @@ class CommandRouteGeneratorTest extends TestCase
         Artisan::call('ziggy:generate');
 
         $this->assertFileEquals('./tests/fixtures/ziggy-custom.js', base_path('resources/js/ziggy.js'));
+    }
+
+    /** @test */
+    public function can_generate_file_with_script_output_formatter()
+    {
+        config([
+            'ziggy' => [
+                'except' => ['admin.*'],
+                'output' => [
+                    'file' => Script::class,
+                ],
+            ],
+        ]);
+
+        $router = app('router');
+        $router->get('posts/{post}/comments', $this->noop())->name('postComments.index');
+        $router->get('admin', $this->noop())->name('admin.dashboard'); // Excluded, should NOT be present in file
+        $router->getRoutes()->refreshNameLookups();
+
+        Artisan::call('ziggy:generate');
+
+        $this->assertFileEquals('./tests/fixtures/ziggy-script.js', base_path('resources/js/ziggy.js'));
     }
 
     /** @test */
